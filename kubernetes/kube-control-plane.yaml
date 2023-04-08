@@ -1,0 +1,20 @@
+- name: Setup control_plane
+  hosts: control_plane
+  tasks:
+  - name: Initialize the Kubernetes cluster using kubeadm
+    command: kubeadm init --apiserver-advertise-address="{{ ansible_eth0.ipv4.address }}" --pod-network-cidr=192.168.0.0/16
+
+  - name: Setup kubeconfig for user
+    command: "{{ item }}"
+    with_items:
+    - mkdir -p  $HOME/.kube
+    - sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+
+  - name: Set the user permissions for kube config
+    shell: sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - name: Install calico pod network
+    command: curl https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml -O
+
+  - name: Apply Calico
+    command: kubectl apply -f calico.yaml
