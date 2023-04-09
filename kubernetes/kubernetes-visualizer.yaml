@@ -1,0 +1,2 @@
+git clone  https://github.com/schoolofdevops/kube-ops-view
+kubectl apply -f kube-ops-view/deploy/
